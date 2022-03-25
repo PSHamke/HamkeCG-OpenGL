@@ -16,6 +16,7 @@ namespace HamkeCG {
 		void Draw();
 		void Scale(sPoints3f scaleFactor);
 		void Translate(sPoints3f translateFactor );
+		void Rotate(float angle,sPoints3f rotateCenter);
 		void Colored(std::vector<std::vector<sColors3f>>* colors3f);
 		void RandomlyColored();
 		void ReadCSV(std::string_view fileName, std::vector<std::vector<sPoints3f>>& points3f,

@@ -19,11 +19,19 @@ outputdir="%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 	
 project "HamkeCG-OpenGL"
 	location "HamkeCG-OpenGL"
-	kind "ConsoleApp"
+	kind "WindowedApp"
 	language "C++"
 	targetdir("bin/" .. outputdir .. "/%{prj.name}")
 	objdir("bin-int/" .. outputdir .. "/%{prj.name}")
-
+	
+	links
+	{
+		"opengl32.lib",
+		"glu32.lib",
+		"glaux.lib",
+		"odbc32.lib",
+		"odbccp32.lib"
+	}
 	
 	files
 	{

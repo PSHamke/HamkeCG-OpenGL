@@ -18,7 +18,7 @@ HGLRC		hRC=NULL;		// Permanent Rendering Context
 HWND		hWnd=NULL;		// Holds Our Window Handle
 HINSTANCE	hInstance;		// Holds The Instance Of The Application
 HamkeCG::SpaceShip* spaceShip;
-float translateFactor;
+sPoints3f translateFactor;
 
 bool	keys[256];			// Array Used For The Keyboard Routine
 bool	active=TRUE;		// Window Actie Flag Set To TRUE By Default
@@ -68,22 +68,35 @@ int InitContent(GLvoid) {
 	CG_CORE_INFO("Content & Log Initialized!");
 	spaceShip = new HamkeCG::SpaceShip("data/SpaceShip.csv");
 	spaceShip->RandomlyColored();
-	translateFactor = -50.0;
+	translateFactor = { 0.0f, 0.0f, -50.0f };
+	CG_CORE_WARN("Scene translated X = {} Y = {} Z = {} ",translateFactor.x, translateFactor.y, translateFactor.z);
 	return TRUE;
 }
 
+int counter = 0;
+float factor = 0.030;
+bool vertical = true;
+//sPoints3f* trFc = new sPoints3f(1.01, 1.0, 1.0);
+sPoints3f* center = new sPoints3f(0.0, 0.0, 0.0);
+float rotateAngle = 0.01;
 int DrawGLScene(GLvoid)									// Here's Where We Do All The Drawing
 {
-	
+	counter++; 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 	glLoadIdentity();// Reset The Current Modelview Matrix
-	glTranslatef(-0.0f, 0.0f,translateFactor);
 
-	
+	CG_CORE_WARN("Scene translated X = {} Y = {} Z = {} ", translateFactor.x, translateFactor.y, translateFactor.z);
+	glTranslatef(translateFactor.x, translateFactor.y, translateFactor.z);
+	//spaceShip->Scale(*trFc);
+	spaceShip->Rotate(rotateAngle, *center);
 	spaceShip->Draw();
-
+	//spaceShip->Translate(*trFc);
 	
-	
+	/*if (counter > 50) {
+		rotateAngle *= -1.0f;
+		trFc->x = 0.99f;
+		counter = 0;
+	}*/
 	//glTranslatef(-1.5f,0.0f,-6.0f);						// Move Left 1.5 Units And Into The Screen 6.0
 	//glBegin(GL_TRIANGLES);								// Drawing Using Triangles
 	//	glColor3f(1.0f,0.0f,0.0f);						// Set The Color To Red

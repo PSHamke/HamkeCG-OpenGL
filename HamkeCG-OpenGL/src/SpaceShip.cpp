@@ -1,10 +1,45 @@
 #include "SpaceShip.h"
+#include <cmath>
 
 namespace HamkeCG {
+
+	
+
 
 	SpaceShip::SpaceShip(std::string_view fileName) {
 		ReadCSV(fileName, m_Points3f, m_Colors3f);
 	}
+
+	void SpaceShip::Translate(sPoints3f translateFactor)
+	{
+		std::vector<sPoints3f>::iterator pInnerIt;
+		for (pOuterIt = m_Points3f.begin(); pOuterIt != m_Points3f.end(); pOuterIt++) {
+			for (pInnerIt = pOuterIt->begin(); pInnerIt != pOuterIt->end(); pInnerIt++) {
+				pInnerIt->x += translateFactor.x;
+				pInnerIt->y += translateFactor.y;
+				pInnerIt->z += translateFactor.z;
+
+			}
+		}
+	}
+
+	void SpaceShip::Rotate(float angle, sPoints3f rotateCenter)
+	{
+		float xNew, yNew;
+		std::vector<sPoints3f>::iterator pInnerIt;
+		for (pOuterIt = m_Points3f.begin(); pOuterIt != m_Points3f.end(); pOuterIt++) {
+			for (pInnerIt = pOuterIt->begin(); pInnerIt != pOuterIt->end(); pInnerIt++) {
+				xNew= (pInnerIt->x * cos(angle)) - (pInnerIt->y * sin(angle));
+				yNew = (pInnerIt->x * sin(angle)) + (pInnerIt->y * cos(angle));
+				pInnerIt->x = xNew;
+				pInnerIt->y = yNew;
+				
+				//pInnerIt->z += translateFactor.z;
+			}
+		}
+		
+	}
+
 	void SpaceShip::Colored(std::vector<std::vector<sColors3f>>* colors3f)
 	{
 		m_Colors3f.clear();
@@ -35,6 +70,7 @@ namespace HamkeCG {
 			m_Colors3fTest.push_back(*innerColors);
 		}
 		Colored(&m_Colors3fTest);
+		CG_CORE_INFO("Randomly Colored");
 	}
 	void SpaceShip::ReadCSV(std::string_view fileName, std::vector<std::vector<sPoints3f>>& points3f,
 		std::vector<std::vector<sColors3f>>& colors3f)  {
@@ -143,4 +179,18 @@ namespace HamkeCG {
 			}
 		}
 	}
+
+	void SpaceShip::Scale(sPoints3f scaleFactor)
+	{
+		std::vector<sPoints3f>::iterator pInnerIt;
+		for (pOuterIt = m_Points3f.begin(); pOuterIt != m_Points3f.end(); pOuterIt++) {
+			for (pInnerIt = pOuterIt->begin(); pInnerIt != pOuterIt->end(); pInnerIt++) {
+				pInnerIt->x *= scaleFactor.x;
+				pInnerIt->y *= scaleFactor.y;
+				pInnerIt->z *= scaleFactor.z;
+
+			}
+		}
+	}
+
 }
