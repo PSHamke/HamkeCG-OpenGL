@@ -1,56 +1,22 @@
 #include "SpaceShip.h"
 #include <cmath>
 
+
 namespace HamkeCG {
-
-	
-
-
-	SpaceShip::SpaceShip(std::string_view fileName) {
-		ReadCSV(fileName, m_Points3f, m_Colors3f);
-	}
-
-	void SpaceShip::Translate(sPoints3f translateFactor)
-	{
-		std::vector<sPoints3f>::iterator pInnerIt;
-		for (pOuterIt = m_Points3f.begin(); pOuterIt != m_Points3f.end(); pOuterIt++) {
-			for (pInnerIt = pOuterIt->begin(); pInnerIt != pOuterIt->end(); pInnerIt++) {
-				pInnerIt->x += translateFactor.x;
-				pInnerIt->y += translateFactor.y;
-				pInnerIt->z += translateFactor.z;
-
-			}
-		}
-	}
-
-	void SpaceShip::Rotate(float angle, sPoints3f rotateCenter)
-	{
-		float xNew, yNew;
-		std::vector<sPoints3f>::iterator pInnerIt;
-		for (pOuterIt = m_Points3f.begin(); pOuterIt != m_Points3f.end(); pOuterIt++) {
-			for (pInnerIt = pOuterIt->begin(); pInnerIt != pOuterIt->end(); pInnerIt++) {
-				xNew= (pInnerIt->x * cos(angle)) - (pInnerIt->y * sin(angle));
-				yNew = (pInnerIt->x * sin(angle)) + (pInnerIt->y * cos(angle));
-				pInnerIt->x = xNew;
-				pInnerIt->y = yNew;
-				
-				//pInnerIt->z += translateFactor.z;
-			}
-		}
-		
-	}
-
-	void SpaceShip::Colored(std::vector<std::vector<sColors3f>>* colors3f)
+	template <typename T>
+	void SpaceShip<T>::Colored(std::vector<std::vector<sColors<T>>>* colors3f)
 	{
 		m_Colors3f.clear();
 		std::copy(colors3f->begin(), colors3f->end(), back_inserter(m_Colors3f));
 	}
-	void SpaceShip::RandomlyColored() {
-		sColors3f customColors(0.0, 1.0, 0.0);
-		std::vector < std::vector <sColors3f>>m_Colors3fTest;
-		std::vector <sColors3f>* innerColors;
-		std::vector <sColors3f>::iterator colorsIt;
-		
+
+	template <typename T>
+	void SpaceShip<T>::RandomlyColored() {
+		sColors<T> customColors(0.0, 1.0, 0.0);
+		std::vector < std::vector <sColors<T>>>m_Colors3fTest;
+		std::vector <sColors<T>>* innerColors;
+
+
 		std::vector<bool>::iterator innerIt;
 		srand(time(NULL));
 		innerIt = shape.begin();
@@ -60,20 +26,23 @@ namespace HamkeCG {
 			if (*innerIt) { delimiter = 4; }
 			else { delimiter = 3; }
 			*innerIt++;
-			innerColors = new std::vector<sColors3f>;
+			innerColors = new std::vector<sColors<T>>;
 			for (int j = 0; j < delimiter; j++) {
+				customColors.x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				customColors.y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				customColors.z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 				innerColors->push_back(customColors);
 			}
-			customColors.x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			customColors.y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			customColors.z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
 			m_Colors3fTest.push_back(*innerColors);
 		}
 		Colored(&m_Colors3fTest);
 		CG_CORE_INFO("Randomly Colored");
 	}
-	void SpaceShip::ReadCSV(std::string_view fileName, std::vector<std::vector<sPoints3f>>& points3f,
-		std::vector<std::vector<sColors3f>>& colors3f)  {
+	
+	template <typename T>
+	void SpaceShip<T>::ReadCSV(std::string_view fileName, std::vector<std::vector<sPoints3<T>>>& points3f,
+		std::vector<std::vector<sColors<T>>>& colors3f)  {
 		using namespace csv;
 		long int counter = 0;
 		// Strategy -1-
@@ -117,13 +86,13 @@ namespace HamkeCG {
 
 			}
 		}
-		std::vector<sColors3f>* cInner = new std::vector<sColors3f>;
-		std::vector<sPoints3f>* pInner = new std::vector<sPoints3f>;
+		std::vector<sColors<T>>* cInner = new std::vector<sColors<T>>;
+		std::vector<sPoints3<T>>* pInner = new std::vector<sPoints3<T>>;
 		shapeIt = shape.begin();
 		int count = 0;
 		for (coordIt = coordBucket.begin(); coordIt != coordBucket.end(); coordIt++) {
-			sPoints3f* n_points3f = new sPoints3f;
-			sColors3f* n_colors3f = new sColors3f;
+			sPoints3<T>* n_points3f = new sPoints3<T>;
+			sColors<T>* n_colors3f = new sColors<T>;
 			n_points3f->x = *(coordIt)++;
 			n_points3f->y = *(coordIt)++;
 			n_points3f->z = *(coordIt)++;
@@ -138,8 +107,8 @@ namespace HamkeCG {
 				points3f.push_back(*pInner);
 				colors3f.push_back(*cInner);
 				count = 0;
-				cInner = new std::vector<sColors3f>;
-				pInner = new std::vector<sPoints3f>;
+				cInner = new std::vector<sColors<T>>;
+				pInner = new std::vector<sPoints3<T>>;
 				shapeIt++;
 				CG_CORE_WARN("Triangle readed!");
 			}
@@ -147,8 +116,8 @@ namespace HamkeCG {
 				points3f.push_back(*pInner);
 				colors3f.push_back(*cInner);
 				count = 0;
-				cInner = new std::vector<sColors3f>;
-				pInner = new std::vector<sPoints3f>;
+				cInner = new std::vector<sColors<T>>;
+				pInner = new std::vector<sPoints3<T>>;
 				shapeIt++;
 				CG_CORE_WARN("Quad readed!");
 			}
@@ -156,10 +125,8 @@ namespace HamkeCG {
 		}
 	}
 
-
-	void SpaceShip::Draw() {
-
-		
+	template <typename T>
+	void SpaceShip<T>::Draw() {
 
 		for (pOuterIt = m_Points3f.begin(), cOuterIt = m_Colors3f.begin();
 			pOuterIt != m_Points3f.end() && cOuterIt != m_Colors3f.end();
@@ -167,30 +134,19 @@ namespace HamkeCG {
 
 			if (pOuterIt->size() == 4) {
 				
-				Quad* quad = new Quad(*pOuterIt, *cOuterIt);
+				Quad<T>* quad = new Quad(*pOuterIt, *cOuterIt);
 				quad->Draw();
 				delete(quad);
 
 			}
 			else if (pOuterIt->size() == 3) {
-				Triangle* triangle = new Triangle(*pOuterIt, *cOuterIt);
+				Triangle<T> * triangle = new Triangle(*pOuterIt, *cOuterIt);
 				triangle->Draw();
 				delete(triangle);
 			}
 		}
 	}
-
-	void SpaceShip::Scale(sPoints3f scaleFactor)
-	{
-		std::vector<sPoints3f>::iterator pInnerIt;
-		for (pOuterIt = m_Points3f.begin(); pOuterIt != m_Points3f.end(); pOuterIt++) {
-			for (pInnerIt = pOuterIt->begin(); pInnerIt != pOuterIt->end(); pInnerIt++) {
-				pInnerIt->x *= scaleFactor.x;
-				pInnerIt->y *= scaleFactor.y;
-				pInnerIt->z *= scaleFactor.z;
-
-			}
-		}
-	}
-
+	
+	template class SpaceShip<double>;
+	template class SpaceShip<float>;
 }

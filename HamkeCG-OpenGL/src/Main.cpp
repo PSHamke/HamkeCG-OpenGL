@@ -12,13 +12,14 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include "sMatrix3.h"
 
 HDC			hDC=NULL;		// Private GDI Device Context
 HGLRC		hRC=NULL;		// Permanent Rendering Context
 HWND		hWnd=NULL;		// Holds Our Window Handle
 HINSTANCE	hInstance;		// Holds The Instance Of The Application
-HamkeCG::SpaceShip* spaceShip;
-sPoints3f translateFactor;
+HamkeCG::SpaceShip<float>* spaceShip;
+sPoints3<float> translateFactor;
 
 bool	keys[256];			// Array Used For The Keyboard Routine
 bool	active=TRUE;		// Window Actie Flag Set To TRUE By Default
@@ -55,7 +56,7 @@ int InitGL(GLvoid)										// All Setup For OpenGL Goes Here
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
 	return TRUE;										// Initialization Went OK
 }
-
+sPoints3<float>* center = new sPoints3<float>(0.5, 0.5, 0.5);
 int InitContent(GLvoid) {
 #ifdef __DEBUG__
 	AllocConsole();
@@ -66,29 +67,40 @@ int InitContent(GLvoid) {
 #endif // !__
 	HamkeCG::Log::Init();
 	CG_CORE_INFO("Content & Log Initialized!");
-	spaceShip = new HamkeCG::SpaceShip("data/SpaceShip.csv");
-	spaceShip->RandomlyColored();
+	spaceShip = new HamkeCG::SpaceShip<float>("data/SpaceShip.csv");
+	
 	translateFactor = { 0.0f, 0.0f, -50.0f };
 	CG_CORE_WARN("Scene translated X = {} Y = {} Z = {} ",translateFactor.x, translateFactor.y, translateFactor.z);
+	sPoints3<float>* testP = new sPoints3<float>(1.0, 1.0, 1.0);
+	sPoints3<float>* testP3 = new sPoints3<float>(2.0, 2.0, 2.0);
+	
+	float testF = 2.0;
+	float testF2 = *testP3 * (*testP);
+	sPoints3 <float> testP2 = *testP * testF;
+	CG_CORE_INFO("Invoke 1 = {} {} {}", testP->x, testP->y , testP ->z );
+	CG_CORE_INFO("Result = {} {} {}", testP2.x, testP2.y , testP2 .z );
+	CG_CORE_INFO("Result2 = {}", testF2);
+	
+	CG_CORE_INFO("Result = {} {} {}", testP3->x, testP3->y, testP3->z);
 	return TRUE;
 }
 
-int counter = 0;
-float factor = 0.030;
-bool vertical = true;
-//sPoints3f* trFc = new sPoints3f(1.01, 1.0, 1.0);
-sPoints3f* center = new sPoints3f(0.0, 0.0, 0.0);
-float rotateAngle = 0.01;
+//int counter = 0;
+//float factor = 0.030;
+//bool vertical = true;
+
+
+float rotateAngle = 0.15;
 int DrawGLScene(GLvoid)									// Here's Where We Do All The Drawing
 {
-	counter++; 
+	/*counter++; */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 	glLoadIdentity();// Reset The Current Modelview Matrix
 
-	CG_CORE_WARN("Scene translated X = {} Y = {} Z = {} ", translateFactor.x, translateFactor.y, translateFactor.z);
+	//CG_CORE_WARN("Scene translated X = {} Y = {} Z = {} ", translateFactor.x, translateFactor.y, translateFactor.z);
 	glTranslatef(translateFactor.x, translateFactor.y, translateFactor.z);
-	//spaceShip->Scale(*trFc);
-	spaceShip->Rotate(rotateAngle, *center);
+	//spaceShip->Scale(*center);
+	
 	spaceShip->Draw();
 	//spaceShip->Translate(*trFc);
 	
@@ -115,6 +127,61 @@ int DrawGLScene(GLvoid)									// Here's Where We Do All The Drawing
 	//	glVertex3f(-1.0f,-1.0f, 0.0f);					// Bottom Left
 	//glEnd();											// Done Drawing The Quad
 	return TRUE;										// Keep Going
+}
+sPoints3<float>* trFc = new sPoints3<float>(0.0, 0.0, 0.0);
+GLvoid UpdateGlScene(GLvoid) {
+	if (keys[VK_F3])						// Is F1 Being Pressed?
+	{
+		keys[VK_F3] = FALSE;
+		spaceShip->RandomlyColored();
+		return;
+	}
+	if (keys[VK_F4])						// Is F1 Being Pressed?
+	{
+		keys[VK_F4] = FALSE;
+		sMatrix3<float> testM1 = sMatrix3<float>::RotationZ(1.5f);
+		spaceShip->Rotate(testM1, *center);
+		return;
+	}
+	if (keys[0x44])						// Is D
+	{
+		
+		trFc->x += 0.5;
+		spaceShip->Translate(*trFc);
+		trFc->x -= 0.5;
+		//keys[0x44] = FALSE;
+		
+	}
+	if (keys[0x41])						// Is A Being Pressed?
+	{
+		
+		trFc->x -= 0.5;
+		spaceShip->Translate(*trFc);
+		trFc->x += 0.5;
+		//keys[0x41] = FALSE;
+		
+	}
+	if (keys[0x57])						// Is W
+	{
+
+		trFc->y += 0.5;
+		spaceShip->Translate(*trFc);
+		trFc->y -= 0.5;
+		//keys[0x44] = FALSE;
+		
+	}
+	if (keys[0x53])						// Is S
+	{
+
+		trFc->y -= 0.5;
+		spaceShip->Translate(*trFc);
+		trFc->y += 0.5;
+		//keys[0x44] = FALSE;
+		
+	}
+	
+	
+	return;
 }
 
 GLvoid KillGLWindow(GLvoid)								// Properly Kill The Window
@@ -448,6 +515,7 @@ int WINAPI WinMain(	HINSTANCE	hInstance,			// Instance
 			}
 			else									// Not Time To Quit, Update Screen
 			{
+				UpdateGlScene();
 				SwapBuffers(hDC);					// Swap Buffers (Double Buffering)
 			}
 

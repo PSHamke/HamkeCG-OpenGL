@@ -127,13 +127,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Core.h" />
+    <ClInclude Include="src\HamkeMath.h" />
     <ClInclude Include="src\Log.h" />
-    <ClInclude Include="src\Primitives.h" />
+    <ClInclude Include="src\GeomShapes.h" />
+    <ClInclude Include="src\sPoints3.h" />
     <ClInclude Include="src\Quad.h" />
+    <ClInclude Include="src\sMatrix3.h" />
     <ClInclude Include="src\SpaceShip.h" />
     <ClInclude Include="src\Triangle.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\GeomShapes.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Quad.cpp" />
